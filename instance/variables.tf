@@ -51,3 +51,15 @@ variable "allowed_ssh_cidr" {
   description = "CIDR blocks allowed for SSH access"
   default     = ["0.0.0.0/0"]
 }
+
+variable "terraform_state_bucket" {
+  type        = string
+  description = "S3 bucket name for storing Terraform state"
+  nullable    = false
+}
+
+variable "terraform_lock_table" {
+  type        = string
+  description = "DynamoDB table name for Terraform state locking"
+  default     = "terraform-locks"
+}

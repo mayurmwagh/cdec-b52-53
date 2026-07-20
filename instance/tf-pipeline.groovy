@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_REGION = 'us-east-1'
+        TERRAFORM_STATE_BUCKET = credentials('terraform-state-bucket')
+    }
+
     stages {
 
         stage('Checkout') {
@@ -17,7 +22,17 @@ pipeline {
                     credentialsId: 'aws-creds']
                 ]) {
                     sh '''
-                    terraform init
+                    cd instance
+                    
+                    # Initialize Terraform with S3 backend
+                    terraform init \
+                      -backend-config="bucket=${TERRAFORM_STATE_BUCKET}" \
+                      -backend-config="key=terraform/state" \
+                      -backend-config="region=${AWS_REGION}" \
+                      -backend-config="encrypt=true" \
+                      -backend-config="dynamodb_table=terraform-locks"
+                    
+                    # Plan and apply
                     terraform plan
                     terraform apply -auto-approve
                     '''
