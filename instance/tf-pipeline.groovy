@@ -1,9 +1,22 @@
 pipeline {
     agent any
 
+    parameters {
+        string(
+            name: 'TERRAFORM_STATE_BUCKET',
+            defaultValue: 'terraform-state-bucket',
+            description: 'S3 bucket name for Terraform state storage'
+        )
+        string(
+            name: 'AWS_REGION',
+            defaultValue: 'us-east-1',
+            description: 'AWS region for deployment'
+        )
+    }
+
     environment {
-        AWS_REGION = 'us-east-1'
-        TERRAFORM_STATE_BUCKET = credentials('terraform-state-bucket')
+        TERRAFORM_STATE_BUCKET = "${params.TERRAFORM_STATE_BUCKET}"
+        AWS_REGION = "${params.AWS_REGION}"
     }
 
     stages {
