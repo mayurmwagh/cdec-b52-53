@@ -21,6 +21,7 @@ pipeline {
                     
                     sh '''
                         export AWS_DEFAULT_REGION=$AWS_REGION
+                        cd instance
                         terraform init
                     '''
                 }
@@ -33,6 +34,7 @@ pipeline {
 
                     sh '''
                         export AWS_DEFAULT_REGION=$AWS_REGION
+                        cd instance                    
                         terraform plan -out=tfplan
                     '''
                 }
@@ -45,6 +47,7 @@ pipeline {
         
                     sh '''
                         export AWS_DEFAULT_REGION=$AWS_REGION
+                        cd instance
                         terraform apply -auto-approve tfplan
                     '''
                 }
