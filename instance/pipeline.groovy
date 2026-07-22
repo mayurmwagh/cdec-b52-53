@@ -1,7 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_REGION = "us-east-1"
+    }
+
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -11,25 +16,46 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
-            }
-        }
-
-        stage('Terraform Validate') {
-            steps {
-                sh 'terraform validate'
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws_creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                        export AWS_DEFAULT_REGION=$AWS_REGION
+                        terraform init
+                    '''
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan -out=tfplan'
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws_creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                        export AWS_DEFAULT_REGION=$AWS_REGION
+                        terraform plan -out=tfplan
+                    '''
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply -auto-approve tfplan'
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws_creds',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                        export AWS_DEFAULT_REGION=$AWS_REGION
+                        terraform apply -auto-approve tfplan
+                    '''
+                }
             }
         }
     }
