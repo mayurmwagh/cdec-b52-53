@@ -4,7 +4,7 @@ provider "aws" {
 
 # Security Group
 resource "aws_security_group" "web_sg" {
-  name        = "web-security-group"
+  name        = "web-security-group1"
   description = "Allow SSH and HTTP"
 
   ingress {
